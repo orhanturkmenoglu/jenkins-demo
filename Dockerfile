@@ -8,4 +8,4 @@ COPY target/springsection5-0.0.1-SNAPSHOT.jar /app/springsection5-0.0.1-SNAPSHOT
 EXPOSE 8083
 
 # Spring Boot uygulamanızı çalıştırıyoruz
-ENTRYPOINT ["java", "-jar", "/app/springsection1-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "/app/springsection5-0.0.1-SNAPSHOT.jar"]
