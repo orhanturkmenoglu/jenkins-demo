@@ -1,0 +1,63 @@
+package com.example.springsection1.config;
+
+import com.example.springsection1.exceptionHandling.CustomAccessDeniedHandler;
+import com.example.springsection1.exceptionHandling.CustomBasicAuthenticationEntryPoint;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+@Configuration
+@Profile("!prod")
+public class SecurityConfig {
+
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+
+        http
+                .requiresChannel(rcc->rcc.anyRequest().requiresInsecure()) // http kullanmak zorunda olacagımızı belirtiyoruz
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests((requests) ->
+                        requests.requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards")
+                                .authenticated()
+                                // bu isteklere de erişim verilecektir kullanıcı kimlik doğrulamasına bakılmaksızın.
+                                .requestMatchers("/myNotices", "/myContact","/register").permitAll()
+
+                );
+        // AbstractHttpConfigurer::disable : ile form tabanlı oturum açma işlemini kaldıracaktır.
+        http.formLogin(withDefaults());
+        // httpBasic (): yöntemi oturumu kullanıcı adı ve şifreyle açmak için kullaınır
+        http.httpBasic(
+                // CustomBasicAuthenticationEntryPoint : oturum açma isteklerinde 401 hatasını özelleştirmek istiyorsak bu classı kullanırız
+                c -> c.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())
+        );
+
+        http.exceptionHandling(ehc->ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
+
+        return http.build();
+    }
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+
+    @Bean
+    public CompromisedPasswordChecker compromisedPasswordChecker() {
+        return new HaveIBeenPwnedRestApiPasswordChecker();
+    }
+
+
+}
