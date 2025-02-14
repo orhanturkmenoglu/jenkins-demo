@@ -56,6 +56,7 @@ pipeline {
 
     environment {
 		DOCKER_IMAGE_SPRING_BOOT = "orhanturkmenoglu/spring-boot-crud-api:latest"
+        DOCKER_IMAGE_JENKINS = "orhanturkmenoglu/jenkins:latest"
     }
 
 	tools {
@@ -77,6 +78,17 @@ pipeline {
             }
         }
 
+        stage('Docker Build & Run Jenkins') {
+			steps {
+				echo "Building Docker image for Jenkins"
+                script {
+					// Jenkins imajını build ediyoruz
+                    dockerImageJenkins = docker.build(DOCKER_IMAGE_JENKINS)
+                    dockerImageJenkins.run('-d -p 8083:8080 -p 50000:50000')  // Jenkins konteynerini çalıştırıyoruz
+                }
+            }
+        }
+
         stage('Docker Build & Run Spring Boot') {
 			steps {
 				echo "Building Docker image for Spring Boot Application"
@@ -88,6 +100,13 @@ pipeline {
             }
         }
 
+        stage('Clean up Jenkins Container') {
+			steps {
+				echo "Cleaning up Jenkins container"
+                sh "docker stop ${dockerImageJenkins.id}"  // Jenkins konteynerini durduruyoruz
+                sh "docker rm ${dockerImageJenkins.id}"    // Jenkins konteynerini siliyoruz
+            }
+        }
 
         stage('Docker Hub Push') {
 			steps {
