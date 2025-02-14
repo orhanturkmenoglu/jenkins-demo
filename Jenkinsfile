@@ -59,6 +59,10 @@ pipeline {
         DOCKER_IMAGE_JENKINS = "orhanturkmenoglu/jenkins:latest"
     }
 
+	tools {
+		maven 'myMaven'
+	}
+
     stages {
 		stage('Checkout') {
 			steps {

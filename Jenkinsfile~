@@ -55,7 +55,8 @@ pipeline {
 	agent any
 
     environment {
-        DOCKER_IMAGE_SPRING_BOOT = "orhanturkmenoglu/spring-boot-crud-api:latest"
+		DOCKER_IMAGE_SPRING_BOOT = "orhanturkmenoglu/spring-boot-crud-api:latest"
+        DOCKER_IMAGE_JENKINS = "orhanturkmenoglu/jenkins:latest"
     }
 
     stages {
@@ -78,7 +79,7 @@ pipeline {
 				echo "Building Docker image for Jenkins"
                 script {
 					// Jenkins imajını build ediyoruz
-                    dockerImageJenkins = docker.build(DOCKER_IMAGE_SPRING_BOOT)
+                    dockerImageJenkins = docker.build(DOCKER_IMAGE_JENKINS)
                     dockerImageJenkins.run('-d -p 8080:8080 -p 50000:50000')  // Jenkins konteynerini çalıştırıyoruz
                 }
             }
@@ -95,16 +96,19 @@ pipeline {
             }
         }
 
+        stage('Clean up Jenkins Container') {
+			steps {
+				echo "Cleaning up Jenkins container"
+                sh "docker stop ${dockerImageJenkins.id}"  // Jenkins konteynerini durduruyoruz
+                sh "docker rm ${dockerImageJenkins.id}"    // Jenkins konteynerini siliyoruz
+            }
+        }
+
         stage('Docker Hub Push') {
 			steps {
 				echo "Pushing Docker images to Docker Hub"
                 script {
-					// Jenkins için Docker Hub'a push işlemi
-                    docker.withRegistry('', 'dockerhub') {
-						dockerImageJenkins.push()
-                    }
-
-                    // Spring Boot için Docker Hub'a push işlemi
+					// Spring Boot için Docker Hub'a push işlemi
                     docker.withRegistry('', 'dockerhub') {
 						dockerImageSpringBoot.push()
                         dockerImageSpringBoot.push('latest')
