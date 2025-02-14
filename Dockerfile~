@@ -14,7 +14,7 @@ RUN jenkins-plugin-cli --plugins "blueocean docker-workflow"
 
 # Spring Boot uygulamanızı kopyalayın ve çalıştırın
 COPY target/spring-boot-crud-api.jar /app/spring-boot-crud-api.jar
-EXPOSE 8083
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/spring-boot-crud-api.jar"]
 
 # Jenkins'i başlatıyoruz
