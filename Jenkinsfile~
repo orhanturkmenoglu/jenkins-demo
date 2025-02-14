@@ -33,10 +33,11 @@ pipeline {
         }
 
         stage ('Docker Hub Push') {
-			steps {
-				echo "Pushing Docker image to Docker Hub"
+				steps {
+					echo "Pushing Docker image to Docker Hub"
 				docker.withRegistry('', 'dockerhub') {
-					dockerImage.push()
+						dockerImage.push();
+					dockerImage.push('latest');
 				}
 			}
 		}

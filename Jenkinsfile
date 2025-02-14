@@ -1,9 +1,9 @@
 pipeline {
 	agent any
 
-	environment {
-		DOCKER_IMAGE = "orhanturkmenoglu/spring-boot-crud-api:latest"
-	}
+    environment {
+		DOCKER_IMAGE = "orhanturkmenoglu/spring-boot-crud-api"
+    }
 
     stages {
 		stage('Checkout') {
@@ -28,19 +28,23 @@ pipeline {
 			steps {
 				script {
 					echo "Building Docker image"
-					dockerImage = docker.build(DOCKER_IMAGE:${env.BUILD_TAG})
+                    // Docker image'ı build et
+                    dockerImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_TAG}")
+                }
             }
         }
 
-        stage ('Docker Hub Push') {
+        stage('Docker Hub Push') {
 			steps {
 				echo "Pushing Docker image to Docker Hub"
-				docker.withRegistry('', 'dockerhub') {
-					dockerImage.push();
-					dockerImage.push('latest');
-				}
-			}
-		}
+                script {
+					// Docker Hub'a push işlemi
+                    docker.withRegistry('', 'dockerhub') {
+						dockerImage.push()  // Image'ı push et
+                        dockerImage.push('latest')  // latest tag ile de push et
+                    }
+                }
+            }
+        }
     }
-}
 }
