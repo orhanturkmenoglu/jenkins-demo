@@ -84,7 +84,7 @@ pipeline {
                 script {
 					// Jenkins imajını build ediyoruz
                     dockerImageJenkins = docker.build(DOCKER_IMAGE_JENKINS)
-                    dockerImageJenkins.run('-d -p 8080:8080 -p 50000:50000')  // Jenkins konteynerini çalıştırıyoruz
+                    dockerImageJenkins.run('-d -p 8083:8080 -p 50000:50000')  // Jenkins konteynerini çalıştırıyoruz
                 }
             }
         }
@@ -95,7 +95,7 @@ pipeline {
                 script {
 					// Spring Boot imajını build ediyoruz
                     dockerImageSpringBoot = docker.build(DOCKER_IMAGE_SPRING_BOOT)
-                    dockerImageSpringBoot.run('-d -p 8081:8080')  // Spring Boot uygulamasını çalıştırıyoruz
+                    dockerImageSpringBoot.run('-d -p 8083:8080')  // Spring Boot uygulamasını çalıştırıyoruz
                 }
             }
         }
