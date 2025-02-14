@@ -39,6 +39,7 @@ pipeline {
 					sh 'echo $DOCKER_HUB_PASS | docker login -u orhanturkmenoglu --password-stdin'
                     sh "docker tag myapp:latest orhanturkmenoglu/spring-boot-crud-api:latest"
 					sh "docker push ${DOCKER_IMAGE}"
+
 			}
 		}
     }
