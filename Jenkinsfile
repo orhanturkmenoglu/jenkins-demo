@@ -35,10 +35,10 @@ pipeline {
         stage ('Docker Hub Push') {
 			steps {
 				echo "Pushing Docker image to Docker Hub"
-                withCredentials([string(credentialsId: 'dockerhub', variable: 'DOCKER_HUB_PASS')]) {
-					sh 'echo $DOCKER_HUB_PASS | docker login -u orhanturkmenoglu --password-stdin'
-                    sh "docker tag myapp:latest orhanturkmenoglu/spring-boot-crud-api:latest"
-					sh "docker push ${DOCKER_IMAGE}"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+					sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    sh "docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE}"
+                    sh "docker push ${DOCKER_IMAGE}"
 			}
 		}
     }
